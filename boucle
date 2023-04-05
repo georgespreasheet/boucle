@@ -1,0 +1,32 @@
+function restoreStatus() {
+  var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+  var dataRange = sheet.getDataRange();
+  var data = dataRange.getValues();
+  var statusColumnIndex = 12; // Index de la colonne L (la première colonne a un index de 0)
+  var numberColumnIndex = 1; // Index de la colonne B
+  var statusMap = {}; // Map pour stocker les statuts par numéro
+
+  data.forEach(function(row, rowIndex) {
+    if (rowIndex > 0) { // Ignorer la première ligne (l'entête)
+      var number = row[numberColumnIndex];
+      var status = row[statusColumnIndex];
+
+      if (number !== "" && status !== "") { // Ignorer les lignes vides
+        statusMap[number] = status;
+      }
+    }
+  });
+
+  data.forEach(function(row, rowIndex) {
+    if (rowIndex > 0) { // Ignorer la première ligne (l'entête)
+      var number = row[numberColumnIndex];
+      var status = statusMap[number];
+
+      if (number !== "" && status !== "") { // Ignorer les lignes vides
+        row[statusColumnIndex] = status;
+      }
+    }
+  });
+
+  dataRange.setValues(data);
+}
