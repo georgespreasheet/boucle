@@ -1,0 +1,10 @@
+function refreshData() {
+  // Ajoutez ici le code pour rafraîchir les données
+  // ...
+  
+  // Appellez la fonction pour restaurer les statuts
+  restoreStatusAfterRefresh();
+}
+
+// Exécute la fonction refreshData toutes les heures
+setInterval(refreshData, 3600000); // 3600000 millisecondes = 1 heure
