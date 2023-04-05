@@ -1,0 +1,31 @@
+function onEdit() {
+  var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+  var dataRange = sheet.getDataRange();
+  var lastRow = dataRange.getLastRow();
+  var lastColumn = dataRange.getLastColumn();
+  var data = dataRange.getValues();
+  var status = {};
+  
+  // Stocker le statut avant le refresh dans un objet
+  for (var i = 1; i < lastRow; i++) {
+    var row = data[i];
+    var numero = row[1];
+    var statut = row[11];
+    status[numero] = statut;
+  }
+  
+  // Code pour rafraîchir les données
+  // ...
+  
+  // Mettre à jour le statut après le refresh en utilisant l'objet
+  for (var i = 1; i < lastRow; i++) {
+    var row = data[i];
+    var numero = row[1];
+    if (numero in status) {
+      row[11] = status[numero];
+    }
+  }
+  
+  // Mettre à jour les données de la feuille
+  dataRange.setValues(data);
+}
