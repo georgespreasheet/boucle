@@ -1,0 +1,36 @@
+function restoreRowPositionsAfterRefresh() {
+  var sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("MaFeuille");
+  var dataRange = sheet.getDataRange();
+  var data = dataRange.getValues();
+  
+  var idIndex = 1; // Colonne B
+  var idListBeforeRefresh = [];
+  
+  // Stocker les ID de chaque ligne avant le rafraîchissement dans un tableau
+  data.forEach(function(row, rowIndex) {
+    if (rowIndex > 0) { // Ignorer la première ligne (l'en-tête)
+      var id = row[idIndex];
+      idListBeforeRefresh.push(id);
+    }
+  });
+  
+  // Rafraîchir les données
+  // ... code du rafraîchissement ...
+  
+  // Déplacer chaque ligne vers sa position initiale
+  var refreshedDataRange = sheet.getDataRange();
+  var refreshedData = refreshedDataRange.getValues();
+  
+  refreshedData.forEach(function(refreshedRow, refreshedRowIndex) {
+    if (refreshedRowIndex > 0) { // Ignorer la première ligne (l'en-tête)
+      var id = refreshedRow[idIndex];
+      var initialPosition = idListBeforeRefresh.indexOf(id) + 2; // Ajouter 2 pour tenir compte de la première ligne et de l'index de base 0
+      
+      if (refreshedRowIndex !== initialPosition) { // Si la ligne a été déplacée pendant le rafraîchissement
+        var rangeToMove = sheet.getRange(refreshedRowIndex, 1, 1, sheet.getLastColumn());
+        var destinationRange = sheet.getRange(initialPosition, 1);
+        rangeToMove.moveTo(destinationRange);
+      }
+    }
+  });
+}
