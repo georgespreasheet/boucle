@@ -1,0 +1,36 @@
+function synchronizeData() {
+  var destinationSheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Feuille de destination");
+  var sourceSpreadsheet = SpreadsheetApp.openById("ID de la feuille source");
+  var sourceSheet = sourceSpreadsheet.getSheetByName("Feuille source");
+
+  var sourceData = sourceSheet.getDataRange().getValues();
+  var destinationData = destinationSheet.getDataRange().getValues();
+
+  var matchedData = sourceData.reduce(function(acc, sourceRow) {
+    var sourceId = sourceRow[0];
+    var sourceStatus = sourceRow[11];
+    
+    var matchFound = destinationData.some(function(destinationRow) {
+      var destinationId = destinationRow[0];
+      var destinationStatus = destinationRow[11];
+      
+      if (destinationId === sourceId) {
+        if (destinationStatus !== sourceStatus) {
+          destinationRow[11] = sourceStatus;
+        }
+        return true;
+      }
+      
+      return false;
+    });
+    
+    if (matchFound || sourceStatus === "") {
+      acc.push(sourceRow);
+    }
+    
+    return acc;
+  }, []);
+
+  destinationSheet.getDataRange().clear();
+  destinationSheet.getRange(1, 1, matchedData.length, matchedData[0].length).setValues(matchedData);
+}
