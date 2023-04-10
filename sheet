@@ -1,32 +1,31 @@
-function updateSheetFromCSV() {
-  // Récupère la feuille de calcul active
+function updateSheetFromGoogleSheet() {
+  // Récupère la feuille de calcul de destination active
   var sheet = SpreadsheetApp.getActiveSheet();
   
-  // Récupère les données de la feuille de calcul sous forme de tableau
+  // Récupère les données de la feuille de calcul de destination sous forme de tableau
   var data = sheet.getDataRange().getValues();
   
-  // Récupère le fichier CSV depuis Google Drive
-  var fileId = 'ID_DU_FICHIER_CSV';
-  var file = DriveApp.getFileById(fileId);
-  var csv = file.getDownloadUrl();
+  // Récupère la feuille de calcul source
+  var sourceId = 'ID_DE_LA_FEUILLE_DE_CALCUL_SOURCE';
+  var source = SpreadsheetApp.openById(sourceId);
   
-  // Convertit les données CSV en tableau
-  var csvData = Utilities.parseCsv(UrlFetchApp.fetch(csv).getContentText());
+  // Récupère les données de la feuille de calcul source sous forme de tableau
+  var sourceData = source.getActiveSheet().getDataRange().getValues();
   
-  // Crée un tableau pour stocker les données à ajouter à la feuille de calcul
+  // Crée un tableau pour stocker les données à ajouter à la feuille de calcul de destination
   var newData = [];
   
-  // Boucle à travers chaque ligne des données CSV
-  for (var i = 0; i < csvData.length; i++) {
-    // Récupère la ligne actuelle du CSV
-    var row = csvData[i];
+  // Boucle à travers chaque ligne des données de la feuille de calcul source
+  for (var i = 0; i < sourceData.length; i++) {
+    // Récupère la ligne actuelle de la feuille de calcul source
+    var row = sourceData[i];
     
-    // Initialise une variable pour suivre si la ligne existe déjà dans la feuille de calcul
+    // Initialise une variable pour suivre si la ligne existe déjà dans la feuille de calcul de destination
     var rowExists = false;
     
-    // Compare les données du CSV à celles de la feuille de calcul pour trouver une correspondance
+    // Compare les données de la feuille de calcul source à celles de la feuille de calcul de destination pour trouver une correspondance
     for (var j = 0; j < data.length; j++) {
-      // Récupère la ligne actuelle de la feuille de calcul
+      // Récupère la ligne actuelle de la feuille de calcul de destination
       var sheetRow = data[j];
       
       // Compare la première colonne des deux lignes
@@ -39,13 +38,13 @@ function updateSheetFromCSV() {
       }
     }
     
-    // Si la ligne n'existe pas déjà dans la feuille de calcul, l'ajoute aux données à ajouter
+    // Si la ligne n'existe pas déjà dans la feuille de calcul de destination, l'ajoute aux données à ajouter
     if (!rowExists) {
       newData.push(row);
     }
   }
   
-  // Si des nouvelles données ont été trouvées, les ajoute à la feuille de calcul
+  // Si des nouvelles données ont été trouvées, les ajoute à la feuille de calcul de destination
   if (newData.length > 0) {
     sheet.getRange(data.length+1, 1, newData.length, newData[0].length).setValues(newData);
   }
