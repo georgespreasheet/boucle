@@ -1,6 +1,7 @@
 function updateSheetFromGoogleSheet() {
   const sourceId = 'ID_DE_LA_FEUILLE_DE_CALCUL_SOURCE';
   const destinationSheetName = 'NOM_DE_LA_FEUILLE_DE_CALCUL_DESTINATION';
+  const keyColumn = 1; // colonne B
   
   var destinationSheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(destinationSheetName);
   if (!destinationSheet) {
@@ -28,8 +29,10 @@ function updateSheetFromGoogleSheet() {
     for (var j = 0; j < destinationData.length; j++) {
       var sheetRow = destinationData[j];
       
-      if (row[0] == sheetRow[0]) {
+      if (row[keyColumn] == sheetRow[keyColumn]) {
         rowExists = true;
+        // Met à jour les données existantes avec les nouvelles données
+        destinationData[j] = row;
         break;
       }
     }
@@ -49,13 +52,18 @@ function updateSheetFromGoogleSheet() {
     if (destinationData.length === 0) {
       startRow = 1;
     } else {
+      // Trie les données de la feuille de destination par ordre croissant de la colonne clé
+      destinationData.sort(function(a, b) {
+        return a[keyColumn] - b[keyColumn];
+      });
+
       // Trouve la position à laquelle les nouvelles données doivent être insérées
       for (var i = 0; i < sourceData.length; i++) {
         var row = sourceData[i];
 
-        // Vérifie si la première colonne de la ligne source existe dans la feuille de calcul de destination
+        // Vérifie si la colonne clé de la ligne source existe dans la feuille de calcul de destination
         var index = destinationData.findIndex(function(r) {
-          return r[0] == row[0];
+          return r[keyColumn] == row[keyColumn];
         });
 
         // Si la ligne n'existe pas, insère les nouvelles données juste avant cette ligne
@@ -66,11 +74,11 @@ function updateSheetFromGoogleSheet() {
       }
     }
 
+    // Insère les nouvelles données à la position déterminée
+    destinationSheet.insertRowsBefore(startRow, numRows);
+    destinationSheet.getRange(startRow, startCol, numRows, numCols).setValues(newData);
+  } else {
     // Si newData est vide, il n'y a pas de données à insérer
-    if (newData.length > 0) {
-      // Insère les nouvelles données à la position déterminée
-      destinationSheet.insertRowsBefore(startRow, numRows);
-      destinationSheet.getRange(startRow, startCol, numRows, numCols).setValues(newData);
-    }
+    return;
   }
 }
