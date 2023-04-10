@@ -45,24 +45,32 @@ function updateSheetFromGoogleSheet() {
     var numRows = newData.length;
     var numCols = newData[0].length;
     
-    // Trouve la position à laquelle les nouvelles données doivent être insérées
-    for (var i = 0; i < sourceData.length; i++) {
-      var row = sourceData[i];
-      
-      // Vérifie si la première colonne de la ligne source existe dans la feuille de calcul de destination
-      var index = destinationData.findIndex(function(r) {
-        return r[0] == row[0];
-      });
-      
-      // Si la ligne n'existe pas, insère les nouvelles données juste avant cette ligne
-      if (index < 0) {
-        startRow = i + 1;
-        break;
+    // Si la feuille de calcul de destination est vide, insère les nouvelles données à la première ligne
+    if (destinationData.length === 0) {
+      startRow = 1;
+    } else {
+      // Trouve la position à laquelle les nouvelles données doivent être insérées
+      for (var i = 0; i < sourceData.length; i++) {
+        var row = sourceData[i];
+
+        // Vérifie si la première colonne de la ligne source existe dans la feuille de calcul de destination
+        var index = destinationData.findIndex(function(r) {
+          return r[0] == row[0];
+        });
+
+        // Si la ligne n'existe pas, insère les nouvelles données juste avant cette ligne
+        if (index < 0) {
+          startRow = i + 1;
+          break;
+        }
       }
     }
-    
-    // Insère les nouvelles données à la position déterminée
-    destinationSheet.insertRowsBefore(startRow, numRows);
-    destinationSheet.getRange(startRow, startCol, numRows, numCols).setValues(newData);
+
+    // Si newData est vide, il n'y a pas de données à insérer
+    if (newData.length > 0) {
+      // Insère les nouvelles données à la position déterminée
+      destinationSheet.insertRowsBefore(startRow, numRows);
+      destinationSheet.getRange(startRow, startCol, numRows, numCols).setValues(newData);
+    }
   }
 }
