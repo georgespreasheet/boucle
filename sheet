@@ -1,51 +1,68 @@
 function updateSheetFromGoogleSheet() {
-  // Récupère la feuille de calcul de destination active
-  var sheet = SpreadsheetApp.getActiveSheet();
+  const sourceId = 'ID_DE_LA_FEUILLE_DE_CALCUL_SOURCE';
+  const destinationSheetName = 'NOM_DE_LA_FEUILLE_DE_CALCUL_DESTINATION';
   
-  // Récupère les données de la feuille de calcul de destination sous forme de tableau
-  var data = sheet.getDataRange().getValues();
+  var destinationSheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(destinationSheetName);
+  if (!destinationSheet) {
+    throw new Error('Feuille de calcul destination introuvable');
+  }
   
-  // Récupère la feuille de calcul source
-  var sourceId = 'ID_DE_LA_FEUILLE_DE_CALCUL_SOURCE';
+  var destinationData = destinationSheet.getDataRange().getValues();
+  
   var source = SpreadsheetApp.openById(sourceId);
+  var sourceSheetName = 'NOM_DE_LA_FEUILLE_SOURCE';
+  var sourceSheet = source.getSheetByName(sourceSheetName);
   
-  // Récupère les données de la feuille de calcul source sous forme de tableau
-  var sourceData = source.getActiveSheet().getDataRange().getValues();
+  if (!sourceSheet) {
+    throw new Error('Feuille de calcul source introuvable');
+  }
   
-  // Crée un tableau pour stocker les données à ajouter à la feuille de calcul de destination
+  var sourceData = sourceSheet.getDataRange().getValues();
+  
   var newData = [];
   
-  // Boucle à travers chaque ligne des données de la feuille de calcul source
   for (var i = 0; i < sourceData.length; i++) {
-    // Récupère la ligne actuelle de la feuille de calcul source
     var row = sourceData[i];
-    
-    // Initialise une variable pour suivre si la ligne existe déjà dans la feuille de calcul de destination
     var rowExists = false;
     
-    // Compare les données de la feuille de calcul source à celles de la feuille de calcul de destination pour trouver une correspondance
-    for (var j = 0; j < data.length; j++) {
-      // Récupère la ligne actuelle de la feuille de calcul de destination
-      var sheetRow = data[j];
+    for (var j = 0; j < destinationData.length; j++) {
+      var sheetRow = destinationData[j];
       
-      // Compare la première colonne des deux lignes
       if (row[0] == sheetRow[0]) {
-        // Met à jour la variable pour indiquer que la ligne existe déjà
         rowExists = true;
-        
-        // Sort de la boucle de comparaison
         break;
       }
     }
     
-    // Si la ligne n'existe pas déjà dans la feuille de calcul de destination, l'ajoute aux données à ajouter
     if (!rowExists) {
       newData.push(row);
     }
   }
   
-  // Si des nouvelles données ont été trouvées, les ajoute à la feuille de calcul de destination
   if (newData.length > 0) {
-    sheet.getRange(data.length+1, 1, newData.length, newData[0].length).setValues(newData);
+    var startRow = destinationData.length + 1;
+    var startCol = 1;
+    var numRows = newData.length;
+    var numCols = newData[0].length;
+    
+    // Trouve la position à laquelle les nouvelles données doivent être insérées
+    for (var i = 0; i < sourceData.length; i++) {
+      var row = sourceData[i];
+      
+      // Vérifie si la première colonne de la ligne source existe dans la feuille de calcul de destination
+      var index = destinationData.findIndex(function(r) {
+        return r[0] == row[0];
+      });
+      
+      // Si la ligne n'existe pas, insère les nouvelles données juste avant cette ligne
+      if (index < 0) {
+        startRow = i + 1;
+        break;
+      }
+    }
+    
+    // Insère les nouvelles données à la position déterminée
+    destinationSheet.insertRowsBefore(startRow, numRows);
+    destinationSheet.getRange(startRow, startCol, numRows, numCols).setValues(newData);
   }
 }
