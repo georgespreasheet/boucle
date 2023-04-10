@@ -1,0 +1,52 @@
+function updateSheetFromCSV() {
+  // Récupère la feuille de calcul active
+  var sheet = SpreadsheetApp.getActiveSheet();
+  
+  // Récupère les données de la feuille de calcul sous forme de tableau
+  var data = sheet.getDataRange().getValues();
+  
+  // Récupère le fichier CSV depuis Google Drive
+  var fileId = 'ID_DU_FICHIER_CSV';
+  var file = DriveApp.getFileById(fileId);
+  var csv = file.getDownloadUrl();
+  
+  // Convertit les données CSV en tableau
+  var csvData = Utilities.parseCsv(UrlFetchApp.fetch(csv).getContentText());
+  
+  // Crée un tableau pour stocker les données à ajouter à la feuille de calcul
+  var newData = [];
+  
+  // Boucle à travers chaque ligne des données CSV
+  for (var i = 0; i < csvData.length; i++) {
+    // Récupère la ligne actuelle du CSV
+    var row = csvData[i];
+    
+    // Initialise une variable pour suivre si la ligne existe déjà dans la feuille de calcul
+    var rowExists = false;
+    
+    // Compare les données du CSV à celles de la feuille de calcul pour trouver une correspondance
+    for (var j = 0; j < data.length; j++) {
+      // Récupère la ligne actuelle de la feuille de calcul
+      var sheetRow = data[j];
+      
+      // Compare la première colonne des deux lignes
+      if (row[0] == sheetRow[0]) {
+        // Met à jour la variable pour indiquer que la ligne existe déjà
+        rowExists = true;
+        
+        // Sort de la boucle de comparaison
+        break;
+      }
+    }
+    
+    // Si la ligne n'existe pas déjà dans la feuille de calcul, l'ajoute aux données à ajouter
+    if (!rowExists) {
+      newData.push(row);
+    }
+  }
+  
+  // Si des nouvelles données ont été trouvées, les ajoute à la feuille de calcul
+  if (newData.length > 0) {
+    sheet.getRange(data.length+1, 1, newData.length, newData[0].length).setValues(newData);
+  }
+}
