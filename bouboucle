@@ -1,0 +1,51 @@
+function updateDestinationSheet() {
+  const sourceSheetId = 'ID_DE_LA_FEUILLE_DE_CALCUL_SOURCE';
+  const destinationSheetName = 'NOM_DE_LA_FEUILLE_DE_CALCUL_DESTINATION';
+  const destinationStartRow = 2; // La première ligne de données de la feuille de calcul de destination
+
+  var destinationSheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(destinationSheetName);
+  if (!destinationSheet) {
+    throw new Error('Feuille de calcul destination introuvable');
+  }
+
+  var sourceSheet = SpreadsheetApp.openById(sourceSheetId).getSheetByName('NOM_DE_LA_FEUILLE_SOURCE');
+
+  var sourceData = sourceSheet.getDataRange().getValues();
+  var destinationData = destinationSheet.getDataRange().getValues();
+
+  // Trouve les numéros des lignes de la source non présentes dans la destination
+  var sourceNumbers = sourceData.map(function(row) {
+    return row[1];
+  });
+  var newRows = sourceData.filter(function(row) {
+    return !destinationData.some(function(destRow) {
+      return destRow[1] === row[1];
+    });
+  });
+
+  // Trouve les numéros des lignes de la destination non présentes dans la source
+  var destinationNumbers = destinationData.map(function(row) {
+    return row[1];
+  });
+  var rowsToDelete = destinationData.filter(function(row) {
+    return !sourceData.some(function(sourceRow) {
+      return sourceRow[1] === row[1];
+    });
+  }).map(function(row) {
+    return destinationData.indexOf(row) + 1;
+  }).reverse();
+
+  // Ajoute les nouvelles lignes à la destination
+  if (newRows.length > 0) {
+    var numRows = newRows.length;
+    var numCols = newRows[0].length;
+
+    destinationSheet.getRange(destinationStartRow, 1, 0, numCols).insertRowsBefore(1, numRows);
+    destinationSheet.getRange(destinationStartRow, 1, numRows, numCols).setValues(newRows);
+  }
+
+  // Supprime les lignes de la destination qui ne sont plus dans la source
+  rowsToDelete.forEach(function(rowIndex) {
+    destinationSheet.deleteRow(rowIndex);
+  });
+}
