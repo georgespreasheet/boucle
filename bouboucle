@@ -1,51 +1,68 @@
-function updateDestinationSheet() {
-  const sourceSheetId = 'ID_DE_LA_FEUILLE_DE_CALCUL_SOURCE';
-  const destinationSheetName = 'NOM_DE_LA_FEUILLE_DE_CALCUL_DESTINATION';
-  const destinationStartRow = 2; // La première ligne de données de la feuille de calcul de destination
 
+
+function DestinationSheet() {
+  const sourceSheetId = '1GqGAarZLDr5Kt5VW-brST210tJEvS255SOVM9VENecU';
+  const sourceSheetName = 'co Priorités Clover';
+  const destinationSheetName = 'copy Priorités Clover';
+  
   var destinationSheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(destinationSheetName);
   if (!destinationSheet) {
     throw new Error('Feuille de calcul destination introuvable');
   }
 
-  var sourceSheet = SpreadsheetApp.openById(sourceSheetId).getSheetByName('NOM_DE_LA_FEUILLE_SOURCE');
-
-  var sourceData = sourceSheet.getDataRange().getValues();
-  var destinationData = destinationSheet.getDataRange().getValues();
-
-  // Trouve les numéros des lignes de la source non présentes dans la destination
-  var sourceNumbers = sourceData.map(function(row) {
-    return row[1];
-  });
-  var newRows = sourceData.filter(function(row) {
-    return !destinationData.some(function(destRow) {
-      return destRow[1] === row[1];
-    });
-  });
-
-  // Trouve les numéros des lignes de la destination non présentes dans la source
-  var destinationNumbers = destinationData.map(function(row) {
-    return row[1];
-  });
-  var rowsToDelete = destinationData.filter(function(row) {
-    return !sourceData.some(function(sourceRow) {
-      return sourceRow[1] === row[1];
-    });
-  }).map(function(row) {
-    return destinationData.indexOf(row) + 1;
-  }).reverse();
-
-  // Ajoute les nouvelles lignes à la destination
-  if (newRows.length > 0) {
-    var numRows = newRows.length;
-    var numCols = newRows[0].length;
-
-    destinationSheet.getRange(destinationStartRow, 1, 0, numCols).insertRowsBefore(1, numRows);
-    destinationSheet.getRange(destinationStartRow, 1, numRows, numCols).setValues(newRows);
+  var sourceSheet = SpreadsheetApp.openById(sourceSheetId).getSheetByName(sourceSheetName);
+  if(!sourceSheet){
+    throw new Error('Feuille de calcul destination introuvable');
   }
 
-  // Supprime les lignes de la destination qui ne sont plus dans la source
-  rowsToDelete.forEach(function(rowIndex) {
-    destinationSheet.deleteRow(rowIndex);
-  });
+  var lastRow = sourceSheet.getLastRow();
+  const startRow = 1; // La première ligne de données de la feuille de calcul source
+  const startColumn = 2; // La première colonne de données de la feuille de calcul source
+  const numRows = lastRow; // Le nombre de lignes de données à récupérer de la feuille de calcul source (0 pour toutes les lignes)
+  const numColumns = 10; // Le nombre de colonnes de données à récupérer de la feuille de calcul source
+
+  var sourceRange = sourceSheet.getRange(startRow, startColumn, numRows, numColumns);
+  var sourceData = sourceRange.getValues();
+
+  //var destinationData = destinationSheet.getDataRange().getValues();
+
+  var lastRow2 = destinationSheet.getLastRow();
+  const startRow2 = 1; // La première ligne de données de la feuille de calcul source
+  const startColumn2 = 2; // La première colonne de données de la feuille de calcul source
+  const numRows2 = lastRow2; // Le nombre de lignes de données à récupérer de la feuille de calcul source (0 pour toutes les lignes)
+  const numColumns2 = 10; // Le nombre de colonnes de données à récupérer de la feuille de calcul source
+
+  var destinationRange = destinationSheet.getRange(startRow2, startColumn2, numRows2, numColumns2);
+  var destinationData = destinationRange.getValues();
+  
+  
+  
+  sourceData.forEach(function(sourceRow, sourceRowIndex) {
+    var r = destinationData.find(function(row, rowIndex){
+    return sourceRow.join()===row.join();
+    })
+    if(!r){
+      destinationSheet.getRange(sourceRowIndex+1 ,2,1,10).setValues([sourceRow])
+    }
+  }) 
+  if(numRows<numRows2){
+    destinationData.forEach(function(row2,indexR){
+      rowS = row2.join();
+      var s = sourceData.find(function(row3,indexS){
+        return rowS===row3.join();
+      })
+      if(!s){
+        destinationSheet.deleteRow([indexR])
+        
+      }
+    })
+  }
+  console.log(numRows,numRows2)
+  
+ 
+ 
+  
+    
 }
+
+ 
