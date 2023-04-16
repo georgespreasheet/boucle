@@ -1,9 +1,9 @@
 
 
 function DestinationSheet() {
-  const sourceSheetId = '1GqGAarZLDr5Kt5VW-brST210tJEvS255SOVM9VENecU';
-  const sourceSheetName = 'co Priorités Clover';
-  const destinationSheetName = 'copy Priorités Clover';
+  const sourceSheetId = 'xxxxxxxxxxx';
+  const sourceSheetName = 'co ';
+  const destinationSheetName = 'copy ';
   
   var destinationSheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(destinationSheetName);
   if (!destinationSheet) {
