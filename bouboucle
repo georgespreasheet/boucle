@@ -1,9 +1,9 @@
 
 
 function DestinationSheet() {
-  const sourceSheetId = 'xxxxxxxxxxx';
-  const sourceSheetName = 'co ';
-  const destinationSheetName = 'copy ';
+  const sourceSheetId = 'xxx';
+  const sourceSheetName = 'xxx';
+  const destinationSheetName = 'xxx';
   
   var destinationSheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(destinationSheetName);
   if (!destinationSheet) {
@@ -14,11 +14,11 @@ function DestinationSheet() {
   if(!sourceSheet){
     throw new Error('Feuille de calcul destination introuvable');
   }
-
+  
   var lastRow = sourceSheet.getLastRow();
   const startRow = 1; // La première ligne de données de la feuille de calcul source
   const startColumn = 2; // La première colonne de données de la feuille de calcul source
-  const numRows = lastRow; // Le nombre de lignes de données à récupérer de la feuille de calcul source (0 pour toutes les lignes)
+  const numRows = lastRow-startRow+1; // Le nombre de lignes de données à récupérer de la feuille de calcul source (0 pour toutes les lignes)
   const numColumns = 10; // Le nombre de colonnes de données à récupérer de la feuille de calcul source
 
   var sourceRange = sourceSheet.getRange(startRow, startColumn, numRows, numColumns);
@@ -29,7 +29,7 @@ function DestinationSheet() {
   var lastRow2 = destinationSheet.getLastRow();
   const startRow2 = 1; // La première ligne de données de la feuille de calcul source
   const startColumn2 = 2; // La première colonne de données de la feuille de calcul source
-  const numRows2 = lastRow2; // Le nombre de lignes de données à récupérer de la feuille de calcul source (0 pour toutes les lignes)
+  const numRows2 = lastRow2+startRow2+1; // Le nombre de lignes de données à récupérer de la feuille de calcul source (0 pour toutes les lignes)
   const numColumns2 = 10; // Le nombre de colonnes de données à récupérer de la feuille de calcul source
 
   var destinationRange = destinationSheet.getRange(startRow2, startColumn2, numRows2, numColumns2);
@@ -52,7 +52,7 @@ function DestinationSheet() {
         return rowS===row3.join();
       })
       if(!s){
-        destinationSheet.deleteRow([indexR])
+        destinationSheet.deleteRow(indexR+startRow2)
         
       }
     })
