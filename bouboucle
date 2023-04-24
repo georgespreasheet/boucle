@@ -1,7 +1,7 @@
-function del() {
-  const sourceSheetId = '';
-  const sourceSheetName = '';
-  const destinationSheetName = '';
+function ddd() {
+  const sourceSheetId = 'xxx';
+  const sourceSheetName = 'xxxx';
+  const destinationSheetName = 'xxxxx';
   
   var destinationSheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(destinationSheetName);
   if (!destinationSheet) {
@@ -16,7 +16,7 @@ function del() {
   var lastRow = sourceSheet.getLastRow();
   const startRow = 2; // La première ligne de données de la feuille de calcul source
   const startColumn = 2; // La première colonne de données de la feuille de calcul source
-  var numRows = lastRow-1; // Le nombre de lignes de données à récupérer de la feuille de calcul source (0 pour toutes les lignes)
+  var numRows = lastRow; // Le nombre de lignes de données à récupérer de la feuille de calcul source (0 pour toutes les lignes)
   const numColumns = 10; // Le nombre de colonnes de données à récupérer de la feuille de calcul source
   
   var sourceRange = sourceSheet.getRange(startRow, startColumn, numRows, numColumns);
@@ -24,166 +24,81 @@ function del() {
   var nonEmpty = sourceData.filter(function(row){
     return row.join('').length>0
   })
-  numRows= nonEmpty.length;
-  var sourceRange = sourceSheet.getRange(startRow, startColumn, numRows, numColumns);
-  var sourceData = sourceRange.getValues();
-  
-  
 
+  numRows= nonEmpty.length;
+  sourceRange = sourceSheet.getRange(startRow, startColumn, numRows, numColumns);
+  var sourceData = sourceRange.getValues();
+
+  
+  
   var lastRow2 = destinationSheet.getLastRow();
   const startRow2 = 2; // La première ligne de données de la feuille de calcul source
   const startColumn2 = 2; // La première colonne de données de la feuille de calcul source
-  var numRows2 = lastRow2-1; // Le nombre de lignes de données à récupérer de la feuille de calcul source (0 pour toutes les lignes)
+  var numRows2 = lastRow2; // Le nombre de lignes de données à récupérer de la feuille de calcul source (0 pour toutes les lignes)
   const numColumns2 = 10; // Le nombre de colonnes de données à récupérer de la feuille de calcul source
   
   
-  var destinationRange = destinationSheet.getRange(startRow2, startColumn2, numRows2+1, numColumns2);
+  var destinationRange = destinationSheet.getRange(startRow2, startColumn2, numRows2, numColumns2);
   var destinationData = destinationRange.getValues();
 
   var nonEmpty2 = destinationData.filter(function(row){
     return row.join('').length>0
   })
   numRows2= nonEmpty2.length;
-  console.log(numRows2)
-  var destinationRange = destinationSheet.getRange(startRow2, startColumn2, numRows2+1, numColumns2);
+
+  var destinationRange = destinationSheet.getRange(startRow2, startColumn2, numRows2, numColumns2);
   var destinationData = destinationRange.getValues();
 
-  destinationSheet.getRange(2,1,numRows2+1,1).clearContent()
+  
+  
 
-  destinationData.forEach(function(a,b){
-    sourceData.forEach(function(c,d){
-      if(a[0]+a[9]===c[0]+c[9]) {
-        var val = sourceSheet.getRange(d+2,4).getValues();
-        destinationSheet.getRange(b+2,4).setValues(val)
+   const sourceRows = sourceRange.getValues().map(function(row) {
+    return row.join(); // On ne compare que la colonne B
+  });
+  
+  const destinationRows = destinationRange.getValues().map(function(row) {
+    return row.join(); // On ne compare que la colonne B
+  });
 
-      }
+  
+ 
+
+  var f = []
+  const rowsToDelete = destinationRows.filter(function(destinationRow,indx) {
+    return !sourceRows.includes(destinationRow,indx)})
+  for (var i = 0;i<rowsToDelete.length;i++){
+    f.push(rowsToDelete.splice(0,1))
+  }
+  
+
+  destinationData.forEach(function(row){
+    var dataS = row.join();
+    var a = f.find(function(r){
+      
+      return dataS===r[0]
+      
     })
-    
-  })
+    if(!a){
+      
+      //destinationSheet.deleteRows(i+2)
 
-  for (var i = numRows2; i >= 1; i--) {
-    var row2 = destinationData[i];              //1
-    var rowS = row2[0]+row2[9]+row2[8];
-    var s = sourceData.find(function(row3){
-      return rowS === row3[0] + row3[9]+row3[8];
-    });
-    if(!s){
-      destinationSheet.deleteRow(i+1);
     }
-  }
-
-  sourceData.forEach(function(sourceRow, sourceRowIndex) {
-    var r = destinationData.find(function(row, rowIndex){
-      return sourceRow[0]+sourceRow[9]===row[0]+row[9];
-    })
-    if(!r){
-      lastRow2=destinationSheet.getLastRow();
-      destinationSheet.getRange(numRows2+2,2,1,10).setValues([sourceRow]);
-      destinationSheet.getDataRange().setHorizontalAlignment("center");
-      numRows2++
-    }
-  })
-  destinationSheet.getRange(2,1,numRows2,14).sort([{ column: 4, ascending: true }]);
-  destinationSheet.getRange(2,1).setFormula("=arrayformula(CONCAT(\"#\",SEQUENCE(Q1)))");
-}
-
-function indicateurUpdate(){
-  const sourceSheetId = 
-  const sourceSheetName = 
-  const destinationSheetName =
-  const sourceSheetName2 =
-  const destinationSheetName2 = 
-
-  var destinationSheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(destinationSheetName);
-  if (!destinationSheet) {
-    throw new Error('Feuille de calcul destination introuvable');
-  }
-
-  var sourceSheet = SpreadsheetApp.openById(sourceSheetId).getSheetByName(sourceSheetName);
-  if(!sourceSheet){
-    throw new Error('Feuille de calcul destination introuvable');
-  }
- var destinationSheet2 = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(destinationSheetName2);
-  if (!destinationSheet2) {
-    throw new Error('Feuille de calcul destination introuvable');
-  }
-
-  var sourceSheet2 = SpreadsheetApp.openById(sourceSheetId).getSheetByName(sourceSheetName2);
-  if(!sourceSheet2){
-    throw new Error('Feuille de calcul destination introuvable');
-  }
-
-  const destinationDataR = destinationSheet.getRange(4,4,4,25).clearContent();
-  const sourceDataR = sourceSheet.getRange(4,4,4,25).getValues();
-  destinationDataR.setValues(sourceDataR);
-
-  const destinationDataS = destinationSheet2.getRange(1,5,2,6).clearContent();
-  const sourceDataS = sourceSheet2.getRange(1,5,2,6).getValues();
-  destinationDataS.setValues(sourceDataS);
-}
-
-
-function update() {
-  const sourceSheetId = '';
-  const sourceSheetName = '';
-  const destinationSheetName = ';
-  
-  var destinationSheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(destinationSheetName);
-  if (!destinationSheet) {
-    throw new Error('Feuille de calcul destination introuvable');
-  }
-
-  var sourceSheet = SpreadsheetApp.openById(sourceSheetId).getSheetByName(sourceSheetName);
-  if(!sourceSheet){
-    throw new Error('Feuille de calcul destination introuvable');
-  }
-  
-  var lastRow = sourceSheet.getLastRow();
-  const startRow = 2; // La première ligne de données de la feuille de calcul source
-  const startColumn = 2; // La première colonne de données de la feuille de calcul source
-  var numRows = lastRow-1; // Le nombre de lignes de données à récupérer de la feuille de calcul source (0 pour toutes les lignes)
-  const numColumns = 10; // Le nombre de colonnes de données à récupérer de la feuille de calcul source
-  
-  var sourceRange = sourceSheet.getRange(startRow, startColumn, numRows, numColumns);
-  var sourceData = sourceRange.getValues();
-  var nonEmpty = sourceData.filter(function(row){
-    return row.join('').length>0
-  })
-  numRows= nonEmpty.length;
-  var sourceRange = sourceSheet.getRange(startRow, startColumn, numRows, numColumns);
-  var sourceData = sourceRange.getValues();
-  
-  
-
-  var lastRow2 = destinationSheet.getLastRow();
-  const startRow2 = 2; // La première ligne de données de la feuille de calcul source
-  const startColumn2 = 2; // La première colonne de données de la feuille de calcul source
-  var numRows2 = lastRow2-1; // Le nombre de lignes de données à récupérer de la feuille de calcul source (0 pour toutes les lignes)
-  const numColumns2 = 10; // Le nombre de colonnes de données à récupérer de la feuille de calcul source
-  
-  
-  var destinationRange = destinationSheet.getRange(startRow2, startColumn2, numRows2+1, numColumns2);
-  var destinationData = destinationRange.getValues();
-
-  var nonEmpty2 = destinationData.filter(function(row){
-    return row.join('').length>0
-  })
-  numRows2= nonEmpty2.length;
-  console.log(numRows2)
-  var destinationRange = destinationSheet.getRange(startRow2, startColumn2, numRows2+1, numColumns2);
-  var destinationData = destinationRange.getValues();
-
-  destinationData.forEach(function(a,b){
-    sourceData.forEach(function(c,d){
-      if(a[0]+a[9]===c[0]+c[9]) {
-        var val = sourceSheet.getRange(d+2,4).getValues();
-        console.log(val)
-
-        destinationSheet.getRange(b+2,4).setValues(val)
-
-      }
-    })
-    
   })
   
+
+  
+  
+  
+
+  //destinationSheet.getRange(2,1).setFormula("=arrayformula(CONCAT(\"#\",SEQUENCE(Q1)))")
+  //destinationSheet.getRange(2,4).setFormula("=iferror(ARRAYFORMULA(VLOOKUP(B2:B,Sheet15!$A$1:$C,3,FALSE)))")
+  //destinationSheet.getRange(2,1,numRows2,14).sort([{ column: 4, ascending: true }]);
+ 
+  
+  
+
+
+
+
+
 }
