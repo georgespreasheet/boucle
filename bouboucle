@@ -48,11 +48,8 @@ function ddd() {
 
   var destinationRange = destinationSheet.getRange(startRow2, startColumn2, numRows2, numColumns2);
   var destinationData = destinationRange.getValues();
-
   
-  
-
-   const sourceRows = sourceRange.getValues().map(function(row) {
+  const sourceRows = sourceRange.getValues().map(function(row) {
     return row.join(); // On ne compare que la colonne B
   });
   
@@ -60,45 +57,15 @@ function ddd() {
     return row.join(); // On ne compare que la colonne B
   });
 
-  
- 
+  var rowsToDelete = [];
 
-  var f = []
-  const rowsToDelete = destinationRows.filter(function(destinationRow,indx) {
-    return !sourceRows.includes(destinationRow,indx)})
-  for (var i = 0;i<rowsToDelete.length;i++){
-    f.push(rowsToDelete.splice(0,1))
-  }
-  
-
-  destinationData.forEach(function(row){
-    var dataS = row.join();
-    var a = f.find(function(r){
-      
-      return dataS===r[0]
-      
-    })
-    if(!a){
-      
-      //destinationSheet.deleteRows(i+2)
-
+  destinationRows.forEach(function(row, index) {
+    if (!sourceRows.includes(row)) {
+      rowsToDelete.push(index + 1);
     }
-  })
+  });
   
-
-  
-  
-  
-
-  //destinationSheet.getRange(2,1).setFormula("=arrayformula(CONCAT(\"#\",SEQUENCE(Q1)))")
-  //destinationSheet.getRange(2,4).setFormula("=iferror(ARRAYFORMULA(VLOOKUP(B2:B,Sheet15!$A$1:$C,3,FALSE)))")
-  //destinationSheet.getRange(2,1,numRows2,14).sort([{ column: 4, ascending: true }]);
- 
-  
-  
-
-
-
-
-
+  rowsToDelete.reverse().forEach(function(rowToDelete) {
+    destinationSheet.deleteRow(rowToDelete);
+  });
 }
