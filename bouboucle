@@ -30,4 +30,17 @@ function deleteRowsNotInSource() {
   rowsToDelete.reverse().forEach(function (rowToDelete) {
     destinationSheet.deleteRow(rowToDelete);
   });
+  
+  const sourceData = sourceSheet.getRange('B2:B').getValues();
+  const destinationData = destinationSheet.getRange('B2:B').getValues();
+
+  const rowsToAdd = sourceData.filter(function(row) {
+    return !destinationData.flat().includes(row[0]);
+  });
+
+  if (rowsToAdd.length > 0) {
+    destinationSheet.insertRowsAfter(destinationSheet.getLastRow(), rowsToAdd.length);
+    const newRange = destinationSheet.getRange(destinationSheet.getLastRow() + 1, 2, rowsToAdd.length, 1);
+    newRange.setValues(rowsToAdd);
+  }
 }
