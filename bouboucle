@@ -1,22 +1,33 @@
-function removeRows() {
-  // Récupère les feuilles source et destination
-  const sourceSheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Feuille source');
-  const destinationSheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Feuille destination');
-  
-  // Récupère les données des feuilles source et destination
-  const sourceData = sourceSheet.getRange('B2:B').getValues().flat();
-  const destinationData = destinationSheet.getRange('B2:B').getValues().flat();
-  
-  // Stocke les index des lignes à supprimer
-  const indexesToDelete = destinationData.reduce((indexes, row, index) => {
-    if (!sourceData.includes(row)) {
-      indexes.push(index + 2);
+function deleteRowsNotInSource() {
+  const sourceSheetId = 'xxx';
+  const sourceSheetName = 'xxx';
+  const destinationSheetName = 'xxx';
+
+  const destinationSheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(destinationSheetName);
+  if (!destinationSheet) {
+    throw new Error('Feuille de calcul destination introuvable');
+  }
+
+  const sourceSheet = SpreadsheetApp.openById(sourceSheetId).getSheetByName(sourceSheetName);
+  if (!sourceSheet) {
+    throw new Error('Feuille de calcul source introuvable');
+  }
+
+  const sourceRange = sourceSheet.getRange('A2:A');
+  const sourceValues = sourceRange.getValues().flat();
+
+  const destinationRange = destinationSheet.getRange('A2:A');
+  const destinationValues = destinationRange.getValues().flat();
+
+  const rowsToDelete = [];
+
+  destinationValues.forEach(function (destinationValue, index) {
+    if (!sourceValues.includes(destinationValue)) {
+      rowsToDelete.push(index + 2);
     }
-    return indexes;
-  }, []);
-  
-  // Supprime les lignes de la feuille destination
-  indexesToDelete.reverse().forEach(index => {
-    destinationSheet.deleteRow(index);
+  });
+
+  rowsToDelete.reverse().forEach(function (rowToDelete) {
+    destinationSheet.deleteRow(rowToDelete);
   });
 }
